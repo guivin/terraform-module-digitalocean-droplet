@@ -1,9 +1,15 @@
+name: Check Terraform Module
 on:
-  - push
-  - pull_request
+  push:
+    branches: [ main ]
+  pull_request:
+
 jobs:
-  validate:
-    runs-on: ubuntu-latest
+  tflint:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
       - uses: actions/checkout@v2
         name: Checkout source code
@@ -12,7 +18,7 @@ jobs:
         name: Cache plugin dir
         with:
           path: ~/.tflint.d/plugins
-          key: tflint-${{ hashFiles('.tflint.hcl') }}
+          key: ${{ matrix.os }}-tflint-${{ hashFiles('.tflint.hcl') }}
 
       - uses: terraform-linters/setup-tflint@v1
         name: Setup TFLint
